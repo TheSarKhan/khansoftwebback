@@ -1,0 +1,55 @@
+# ============================================================
+# KhanSoft — root .gitignore
+# ============================================================
+
+# Secrets — never commit
+.env
+.env.local
+.env.prod
+.env.*.local
+**/.env
+!**/.env.example
+!**/.env.prod.example
+
+# --- Node / Next.js ---
+node_modules/
+.next/
+out/
+dist/
+build/
+.turbo/
+*.tsbuildinfo
+next-env.d.ts
+
+# --- Java / Maven ---
+target/
+*.class
+*.jar
+*.war
+.mvn/
+mvnw
+mvnw.cmd
+hs_err_pid*
+
+# --- IDE ---
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# --- Uploaded images ---
+images/
+
+# --- Logs ---
+*.log
+logs/
+
+# --- Playwright ---
+playwright-report/
+test-results/
+playwright/.cache/
+
+# --- OS / temp ---
+*.swp
+*.tmp

@@ -1,0 +1,70 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: khansoft-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - khansoft_postgres_data:/var/lib/postgresql/data
+    networks:
+      - khansoft-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: khansoft-redis
+    ports:
+      - "${REDIS_PORT}:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - khansoft_redis_data:/data
+    networks:
+      - khansoft-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    image: maven:3.9-eclipse-temurin-17
+    container_name: khansoft-backend
+    working_dir: /app
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/khansoft_db
+      SPRING_DATASOURCE_USERNAME: khansoft_user
+      SPRING_DATASOURCE_PASSWORD: khansoft_pass
+      SPRING_REDIS_HOST: redis
+      SPRING_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS}
+    ports:
+      - "8080:8080"
+    volumes:
+      - .:/app
+      - maven_cache:/root/.m2
+    networks:
+      - khansoft-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: mvn -f backend/pom.xml clean spring-boot:run -DskipTests
+
+volumes:
+  khansoft_postgres_data:
+  khansoft_redis_data:
+  maven_cache:
+
+networks:
+  khansoft-network:
+    driver: bridge

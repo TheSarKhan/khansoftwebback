@@ -20,7 +20,6 @@ public class BlogController {
     private final BlogPostRepository blogPostRepository;
 
     @GetMapping("/blog")
-    @Cacheable("blogPosts")
     public Page<BlogPost> getPublishedPosts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "9") int size) {

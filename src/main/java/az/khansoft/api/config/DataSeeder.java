@@ -20,6 +20,7 @@ public class DataSeeder implements CommandLineRunner {
     private final ServiceRepository serviceRepository;
     private final ProjectRepository projectRepository;
     private final TeamMemberRepository teamMemberRepository;
+    private final BlogPostRepository blogPostRepository;
     private final SiteSettingRepository settingRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -41,6 +42,7 @@ public class DataSeeder implements CommandLineRunner {
         seedServices();
         seedProjects();
         seedTeam();
+        seedBlogPosts();
         seedSettings();
     }
 
@@ -100,7 +102,13 @@ public class DataSeeder implements CommandLineRunner {
                 .descriptionAz("Məlumatınızı qərara çevirən dashboard və hesabat sistemləri.")
                 .icon("BarChart3").sortOrder(6).active(true).build());
 
-        log.info("Seeded 6 services");
+        serviceRepository.save(Service.builder()
+                .title("Telegram bots").titleAz("Telegram botlar")
+                .description("Custom Telegram bots for orders, support, notifications and business automation.")
+                .descriptionAz("Sifariş qəbulu, müştəri dəstəyi, bildirişlər və biznes avtomatlaşdırması üçün Telegram botlar.")
+                .icon("Bot").sortOrder(7).active(true).build());
+
+        log.info("Seeded 7 services");
     }
 
     private void seedProjects() {
@@ -129,14 +137,53 @@ public class DataSeeder implements CommandLineRunner {
         log.info("Seeded 1 team member");
     }
 
+    private void seedBlogPosts() {
+        if (blogPostRepository.count() > 0) return;
+
+        blogPostRepository.save(BlogPost.builder()
+                .title("Niyə hər biznesin veb sayta ehtiyacı var?")
+                .slug("niye-her-biznesin-veb-sayta-ehtiyaci-var")
+                .summary("Instagram səhifəsi kifayət deyil. Müasir müştəri sizi Google-da axtarır — tapılmırsınızsa, mövcud deyilsiniz.")
+                .content("<p>Azərbaycanda bir çox kiçik biznes hələ də yalnız Instagram səhifəsi ilə işləyir. Amma müştərilərin 70%-dən çoxu yeni xidmət axtaranda Google-a yazır. Əgər orada yoxsunuzsa — rəqibiniz tapılır.</p><h2>Veb sayt nə verir?</h2><p><strong>1. Etibarlılıq.</strong> Saytı olan şirkət daha ciddi qəbul edilir. Vizitka, portfolio, əlaqə — hamısı bir yerdə.</p><p><strong>2. 7/24 satış.</strong> Saytınız gecə-gündüz işləyir. Siz yatanda da müştəri sizin haqqınızda oxuyur.</p><p><strong>3. SEO — pulsuz müştəri.</strong> Google-da görünmək reklam xərci olmadan müştəri gətirir.</p><p><strong>4. Nəzarət.</strong> Instagram algoritmi dəyişir — saytınız sizindir, heç kim onu sizə bağlaya bilməz.</p><h2>Nə etməli?</h2><p>Sadə korporativ sayt 1-2 həftəyə hazır olur. StarSoft olaraq biz sabit qiymətə, admin panelli, SEO dostu saytlar qururuq. İlk konsultasiya pulsuzdur.</p>")
+                .tags("web,sayt,biznes,SEO")
+                .author("StarSoft")
+                .published(true)
+                .publishedAt(java.time.LocalDateTime.now().minusDays(3))
+                .build());
+
+        blogPostRepository.save(BlogPost.builder()
+                .title("Telegram bot biznesinizə necə kömək edə bilər?")
+                .slug("telegram-bot-biznesinize-nece-komek-ede-biler")
+                .summary("Sifariş qəbulundan müştəri dəstəyinə qədər — Telegram bot əl işini azaldır, müştəri məmnuniyyətini artırır.")
+                .content("Azərbaycanda Telegram istifadəçi sayı sürətlə artır. Biznes üçün bu bir fürsətdir — müştəriləriniz artıq oradadır.\n\n## Telegram bot nə edə bilər?\n\n**1. Sifariş qəbulu.** Müştəri bot vasitəsilə məhsul seçir, sifariş verir. Siz admin paneldən izləyirsiniz.\n\n**2. Avtomatik cavab.** Ən çox verilən suallara bot dərhal cavab verir — siz hər mesajı əl ilə yazmırsınız.\n\n**3. Bildirişlər.** Yeni sifariş, ödəniş, çatdırılma statusu — müştəriyə avtomatik Telegram bildirişi gedir.\n\n**4. CRM inteqrasiya.** Bot məlumatları birbaşa sisteminizə yazır — əl ilə köçürmə lazım deyil.\n\n## Kimə lazımdır?\n\n- Restoran və kafe (menyu + sifariş)\n- Online mağaza (katalog + sifariş)\n- Xidmət şirkətləri (rezervasiya + xatırlatma)\n- Təhsil (qeydiyyat + nəticə bildirişi)\n\nStarSoft sadə FAQ botdan mürəkkəb CRM botuna qədər hər həll üçün hazırdır.")
+                .tags("telegram,bot,avtomatlaşdırma,biznes")
+                .author("StarSoft")
+                .published(true)
+                .publishedAt(java.time.LocalDateTime.now().minusDays(1))
+                .build());
+
+        blogPostRepository.save(BlogPost.builder()
+                .title("Kibertəhlükəsizlik: kiçik bizneslər üçün 5 sadə addım")
+                .slug("kibertehlukesizlik-kicik-biznesler-ucun-5-sade-addim")
+                .summary("Haker yalnız böyük şirkətləri hədəf almır. Kiçik bizneslər daha asan hədəfdir — amma qorunmaq çətin deyil.")
+                .content("Azərbaycanda kiçik bizneslər tez-tez düşünür: 'Bizi kim hack edəcək ki?' Amma statistikaya görə kiber hücumların 43%-i kiçik bizneslərə yönəlir — çünki onlar daha az qorunur.\n\n## 5 sadə addım:\n\n**1. Güclü şifrə + 2FA.** Bütün hesablarda iki faktorlu autentifikasiya aktiv edin. Bu bir dəqiqəlik işdir.\n\n**2. Yeniləmələri gecikdirməyin.** Sistem və proqram yeniləmələri təhlükəsizlik boşluqlarını bağlayır.\n\n**3. Backup qurun.** Həftəlik avtomatik backup — ransomware hücumundan yeganə sığorta.\n\n**4. Komandanı öyrədin.** Phishing e-poçtlarını tanımaq təlimi — ən effektiv qorunma.\n\n**5. SSL sertifikat.** Saytınız https ilə açılmalıdır — həm təhlükəsizlik, həm SEO üçün.\n\nBunlar əsas addımlardır. Daha dərin audit lazımdırsa — StarSoft təhlükəsizlik xidməti ilə tam yoxlama keçirə bilərsiniz.")
+                .tags("təhlükəsizlik,kibertəhlükəsizlik,biznes,hack")
+                .author("StarSoft")
+                .published(true)
+                .publishedAt(java.time.LocalDateTime.now())
+                .build());
+
+        log.info("Seeded 3 blog posts");
+    }
+
     private void seedSettings() {
         if (settingRepository.count() > 0) return;
 
         settingRepository.save(SiteSetting.builder()
-                .settingKey("site_title").settingValue("KhanSoft")
+                .settingKey("site_title").settingValue("StarSoft")
                 .description("Site title").build());
         settingRepository.save(SiteSetting.builder()
-                .settingKey("site_description").settingValue("Biznesinizin texniki tərəfi artıq sizin dərdiniz deyil")
+                .settingKey("site_description").settingValue("Texnologiyanızı ulduzlara çatdırırıq")
                 .description("Site tagline").build());
         settingRepository.save(SiteSetting.builder()
                 .settingKey("contact_email").settingValue("sarxanbabayevcontact@gmail.com")

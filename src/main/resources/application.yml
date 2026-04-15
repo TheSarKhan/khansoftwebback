@@ -65,7 +65,8 @@ logging:
 
 jwt:
   secret: ${JWT_SECRET:dev-only-change-me-in-prod-min-32-bytes-required-for-hs256-signing}
-  expiration: ${JWT_EXPIRATION:86400000}
+  expiration: ${JWT_EXPIRATION:900000}
+  refresh-expiration: ${JWT_REFRESH_EXPIRATION:604800000}
 
 app:
   cors:

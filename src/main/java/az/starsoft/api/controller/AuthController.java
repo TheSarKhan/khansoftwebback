@@ -39,13 +39,29 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword()));
 
         String token = tokenProvider.generateToken(authentication);
+        String refreshToken = tokenProvider.generateRefreshToken(
+                ((CustomUserDetails) authentication.getPrincipal()).getUsername());
         CustomUserDetails user = (CustomUserDetails) authentication.getPrincipal();
 
         return ResponseEntity.ok(new AuthResponse(
                 token,
+                refreshToken,
                 user.getUsername(),
                 user.getFullName(),
                 user.getAuthorities().iterator().next().getAuthority()));
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refresh(@RequestBody Map<String, String> body) {
+        String refreshToken = body.get("refreshToken");
+        if (refreshToken == null || !tokenProvider.validateRefreshToken(refreshToken)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "invalid_refresh_token"));
+        }
+        String username = tokenProvider.getUsernameFromToken(refreshToken);
+        String newToken = tokenProvider.generateTokenForUsername(username);
+        String newRefresh = tokenProvider.generateRefreshToken(username);
+        return ResponseEntity.ok(Map.of("token", newToken, "refreshToken", newRefresh));
     }
 
     private String clientIp(HttpServletRequest request) {

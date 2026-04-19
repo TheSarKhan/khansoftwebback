@@ -66,10 +66,12 @@ public class ImageController {
             String url = "/images/" + filename;
             return ResponseEntity.ok(Map.of("url", url, "filename", filename));
         } catch (IOException e) {
-            log.error("Image upload failed — dir={} file={} cause={}", uploadDir, filename, e.getMessage(), e);
+            String detail = String.format("dir=%s writable=%s cause=%s: %s",
+                    uploadDir, uploadDir.toFile().canWrite(), e.getClass().getSimpleName(), e.getMessage());
+            log.error("Image upload failed — {}", detail, e);
             return ResponseEntity.internalServerError().body(Map.of(
                     "error", "upload_failed",
-                    "message", "Yükləmə uğursuz oldu: " + e.getMessage()
+                    "message", detail
             ));
         }
     }
